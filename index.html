@@ -1,29 +1,31 @@
 <html>
 <script src='https://d3js.org/d3.v5.min.js'></script>
-<body>
+<body onload="init()">
 <svg width=150 height=300>
 </svg>
 <script>
+async function init() {
+  data = await d3.csv("./Electric_Vehicle_Population_Data.csv");
 
-data = d3.csv("./Electric_Vehicle_Population_Data.csv")
+  xdomain = [2008, 2023];
+  xrange = [0,1];
+  ydomain = [0,337];
+  yrange = [0,1];
 
-xdomain = [2008, 2023];
-xrange = [0,1];
-ydomain = [0,337];
-yrange = [0,1];
+  xs = d3.scaleLinear().domain(xdomain).range(xrange);
+  ys = d3.scaleLinear().domain(ydomain).range(yrange);
 
-xs = d3.scaleLinear().domain(xdomain).range(xrange);
-ys = d3.scaleLinear().domain(ydomain).range(yrange);
+  d3.select('svg')
+    .selectAll('rect')
+    .data(data.slice(0,5))
+    .enter()
+    .append('rect')
+      .attr('x',20)
+      .attr('y',function(d,i) {return ys(i);})
+      .attr('width',function(d,i) {return xs(d);})
+      .attr('height',10)
+}
 
-d3.select('svg')
-  .selectAll('rect')
-  .data(data.slice(0,5))
-  .enter()
-  .append('rect')
-    .attr('x',20)
-    .attr('y',function(d,i) {return ys(i);})
-    .attr('width',function(d,i) {return xs(d);})
-    .attr('height',10)
 </script>
 </body>
 </html>
