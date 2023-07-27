@@ -1,12 +1,42 @@
 <html>
 <script src='https://d3js.org/d3.v5.min.js'></script>
+<script src="https://d3js.org/topojson.v1.min.js"></script>
 <body onload="init()">
-<svg width=150 height=300>
+<svg viewBox="0 0 975 610">
+  <g fill="none" stroke="#000" stroke-linejoin="round" stroke-linecap="round">
+  </g>
 </svg>
 <script>
 async function init() {
-  data = await d3.csv("./Electric_Vehicle_Population_Data.csv");
 
+  path = d3.geoPath();
+  us = await d3.json("counties-albers-10m.json");
+  d3.select('svg')
+    .selectAll('path')
+    .data(us)
+    .enter()
+    .append('path')
+      .attr('stroke', '#aaa')
+      .attr('stroke-width', '0.5')
+      .attr('d', path(topojson.mesh(us, us.objects.counties, (a, b) => a !== b && (a.id / 1000 | 0) === (b.id / 1000 | 0))));
+
+  d3.select('svg')
+    .selectAll('path')
+    .data(us)
+    .enter()
+    .append('path')
+      .attr('stroke-width', '0.5')
+      .attr('d', path(topojson.mesh(us, us.objects.states, (a, b) => a !== b)));
+
+  d3.select('svg')
+    .selectAll('path')
+    .data(us)
+    .enter()
+    .append('path')
+      .attr('d', path(topojson.feature(us, us.objects.nation)));
+
+  //data = await d3.csv("./Electric_Vehicle_Population_Data.csv");
+  /*
   xdomain = [2008, 2023];
   xrange = [0,1];
   ydomain = [0,337];
@@ -24,6 +54,8 @@ async function init() {
       .attr('y',function(d,i) {return ys(i);})
       .attr('width',function(d,i) {return xs(d);})
       .attr('height',10)
+  */
+ 
 }
 
 </script>
