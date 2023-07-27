@@ -8,9 +8,11 @@
 </svg>
 <script>
 async function init() {
+  //https://observablehq.com/@d3/u-s-map
+  //open /Applications/Google\ Chrome.app --args --user-data-dir="/var/tmp/chrome-dev-disabled-security" --disable-web-security --disable-site-isolation-trials
 
   path = d3.geoPath();
-  us = await d3.json("counties-albers-10m.json");
+  us = await d3.json("./counties-albers-10m.json");
   d3.select('svg')
     .selectAll('path')
     .data(us)
