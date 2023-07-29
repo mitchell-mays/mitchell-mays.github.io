@@ -1,43 +1,193 @@
 <html>
+<head>
+  <link rel="stylesheet" href="styles.css">
+</head>
 <script src='https://d3js.org/d3.v5.min.js'></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
 <body onload="init()">
-<svg viewBox="0 0 975 610">
-  <g fill="none" stroke="#000" stroke-linejoin="round" stroke-linecap="round">
-  </g>
-</svg>
+<div class="main">
+  <div class="sidebar">
+    <div id="2007" class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img><h2>2007</h2></div> 
+    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
+    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
+    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
+    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
+    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
+  </div>
+  <div class="centerContainer">
+    <h1>Indianapolis Violent Crime</h1>
+    <div class="centerDisplay">
+      <img id="indymap" src="imgs/IndyMap.png"></img>
+      <svg viewBox="0 0 700 600">
+        <g fill="none" stroke="#000" stroke-linejoin="round" stroke-linecap="round">
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
 <script>
+
+function calculateMapFadeIn(entry, year, timeStart, totalDuration){
+  const start = new Date(year,1,1);
+  const end = new Date(year,12,31);
+  const day = new Date(Date.parse(entry.DATETIME));
+  day.setMonth(day.getMonth() + 1);
+
+  //use Math.abs to avoid sign
+  const q = Math.abs(day-start);
+  const d = Math.abs(end-start);
+  
+  const percent = (q/d);
+  return timeStart + totalDuration*percent;
+}
+
 async function init() {
+  //https://www.coursera.org/learn/cs-416-dv/assignment-submission/Y5Kdl/create-a-narrative-visualization/attempt
   //https://observablehq.com/@d3/u-s-map
   //open /Applications/Google\ Chrome.app --args --user-data-dir="/var/tmp/chrome-dev-disabled-security" --disable-web-security --disable-site-isolation-trials
+  //file:///Users/rmmays/Documents/MitchCode/D3_Project/mitchell-mays.github.io/index.html
 
-  path = d3.geoPath();
-  us = await d3.json("./counties-albers-10m.json");
-  d3.select('svg')
-    .selectAll('path')
-    .data(us)
-    .enter()
+  // ================================================
+  // ================================================
+  // Step 1: Load the streets and visualize the city
+  // ================================================
+  // ================================================
+
+  
+  indianaRoads = await d3.json("./Road_Centerlines_of_Indiana_2021.json");
+  width = 700;
+  height = 600;
+  projection = d3.geoAlbers().rotate([85]);
+  projection.fitSize([width,height],indianaRoads);
+
+  /*
+  path = d3.geoPath().projection(projection);
+
+  geojson_base = {
+    "type": "FeatureCollection",
+    "features": []
+  };
+
+  // Deep copy base
+  geojson_highways = JSON.parse(JSON.stringify(geojson_base));
+  indianaRoadsHighways = indianaRoads.features.filter(function(d){ return (d.properties.speedlimit >= 50); })
+  geojson_highways.features = indianaRoadsHighways
+  console.log(indianaRoadsHighways.length)
+
+  d3.select('g')
+    .append('path')
+      .attr('stroke', '#000')
+      .attr('stroke-width', '2')
+      .attr('d', path(geojson_highways))
+      .attr("fill", "none");
+
+
+  // Deep copy base
+  geojson_roads1 = JSON.parse(JSON.stringify(geojson_base));
+  indianaRoads1 = indianaRoads.features.filter(function(d){ return (d.properties.speedlimit >= 35); })
+  geojson_roads1.features = indianaRoads1
+  console.log(indianaRoads1.length)
+
+  d3.select('g')
+    .append('path')
+      .attr('stroke', '#aaa')
+      .attr('stroke-width', '1')
+      .attr('d', path(geojson_roads1))
+      .attr("fill", "none");
+
+  // Deep copy base
+  geojson_roads2 = JSON.parse(JSON.stringify(geojson_base));
+  indianaRoads2 = indianaRoads.features.filter(function(d){ return (d.properties.speedlimit < 35); })
+  geojson_roads2.features = indianaRoads2
+  console.log(indianaRoads2.length)
+
+  d3.select('g')
     .append('path')
       .attr('stroke', '#aaa')
       .attr('stroke-width', '0.5')
-      .attr('d', path(topojson.mesh(us, us.objects.counties, (a, b) => a !== b && (a.id / 1000 | 0) === (b.id / 1000 | 0))));
+      .attr('d', path(geojson_roads2))
+      .attr("fill", "none");
+  */
+  
+  // ================================================
+  // ================================================
+  // Step 2: Load the City Crime Data
+  // ================================================
+  // ================================================
 
-  d3.select('svg')
-    .selectAll('path')
-    .data(us)
-    .enter()
-    .append('path')
-      .attr('stroke-width', '0.5')
-      .attr('d', path(topojson.mesh(us, us.objects.states, (a, b) => a !== b)));
+  //, which is configured for a 975x610 viewport.
+  data = await d3.csv("./data/IMPD_UCR_2007_Data.csv");
+  data = data.filter(function(d){ return ((d.X_COORD !== "0.0") && (d.Y_COORD !== "0.0")); });
 
-  d3.select('svg')
-    .selectAll('path')
-    .data(us)
-    .enter()
-    .append('path')
-      .attr('d', path(topojson.feature(us, us.objects.nation)));
+  //d3.selectAll("element").remove()
 
-  //data = await d3.csv("./Electric_Vehicle_Population_Data.csv");
+  let dur = 5000;
+  let animStart = 1000;
+
+  //let years = [2007, ]
+
+  //Show minimap after animation completes
+  setTimeout(function(){
+    document.getElementById("2007").style.display = "flex";
+  }, animStart + dur);
+
+  // HOMICIDE
+  data.filter(function(d){ return d.CATEGORY === "CRIMINAL HOMICIDE"; })
+   .forEach(function(d, i){
+      if (projection([d.X_COORD, d.Y_COORD]) === null) { console.log(d.X_COORD, d.Y_COORD); };
+      setTimeout(function(){
+        d3.select('svg')
+          .append('circle')
+            .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+            .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+            .attr('r', '8px' )
+            .style("opacity", 1)
+            .attr("fill", '#1f2124')
+            .transition()
+            .duration(1000)
+            .style("opacity", 0.8)
+            .attr('r', '5px' )
+      }, calculateMapFadeIn(d, 2007, animStart, dur));
+  });
+
+  // RAPE
+  data.filter(function(d){ return d.CATEGORY === "RAPE"; })
+   .forEach(function(d, i){
+      if (projection([d.X_COORD, d.Y_COORD]) === null) { console.log(d.X_COORD, d.Y_COORD); };
+      setTimeout(function(){
+        d3.select('svg')
+          .append('circle')
+            .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+            .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+            .attr('r', '3px' )
+            .style("opacity", 1)
+            .attr("fill", 'red')
+            .transition()
+            .duration(500)
+            .style("opacity", 0.4)
+            .attr('r', '2px' )
+      }, calculateMapFadeIn(d, 2007, animStart, dur));
+  });
+
+  // ASSAULT
+  data.filter(function(d){ return d.CATEGORY === "ASSAULT"; })
+   .forEach(function(d, i){
+      if (projection([d.X_COORD, d.Y_COORD]) === null) { console.log(d.X_COORD, d.Y_COORD); };
+      setTimeout(function(){
+        d3.select('svg')
+          .append('circle')
+            .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+            .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+            .attr('r', '3px' )
+            .style("opacity", 1)
+            .attr("fill", '#0a4a2a')
+            .transition()
+            .duration(200)
+            .style("opacity", 0.2)
+            .attr('r', '2px' )
+      }, calculateMapFadeIn(d, 2007, animStart, dur));
+  });
+
   /*
   xdomain = [2008, 2023];
   xrange = [0,1];
@@ -46,18 +196,7 @@ async function init() {
 
   xs = d3.scaleLinear().domain(xdomain).range(xrange);
   ys = d3.scaleLinear().domain(ydomain).range(yrange);
-
-  d3.select('svg')
-    .selectAll('rect')
-    .data(data.slice(0,5))
-    .enter()
-    .append('rect')
-      .attr('x',20)
-      .attr('y',function(d,i) {return ys(i);})
-      .attr('width',function(d,i) {return xs(d);})
-      .attr('height',10)
   */
- 
 }
 
 </script>

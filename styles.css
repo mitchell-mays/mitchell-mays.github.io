@@ -1,0 +1,73 @@
+svg {
+    position: absolute; 
+    width: 700px; 
+    height: 600px;
+}
+
+#indymap {
+    position: absolute; 
+    max-width: 700px;
+    max-height: 600px;
+    margin-left: 46px;
+    margin-top: 1px;
+}
+
+.main {
+    display: flex;
+}
+
+.centerDisplay {
+    width: 700px;
+    height: 600px;
+}
+
+.centerContainer {
+    margin-top: 80px;
+    height: 700px;
+    display: flex;
+    flex-direction: column;
+}
+
+#heatmap {
+    position: absolute;
+}
+
+h1 { 
+    font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif; 
+    font-size: 40px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 700;
+    line-height: 26.4px;
+    margin: 0px auto 20px  auto;
+}
+
+h2 { 
+    font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif; 
+    font-size: 20px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 500;
+    line-height: 26.4px;
+    margin: 5px auto;
+}
+
+.sidebar {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    min-height: -webkit-min-content;
+    overflow: auto;
+    height: 800px;
+}
+
+.imgDiv {
+    margin: 10px auto;
+    flex-direction: column;
+    display: none;
+}
+
+.sideImage {
+    max-width: 260px;
+    max-height: 400px;
+}
