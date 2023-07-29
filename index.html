@@ -8,15 +8,28 @@
 <div class="main">
   <div class="sidebar">
     <div id="2007" class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img><h2>2007</h2></div> 
-    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
-    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
-    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
-    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
-    <div class="imgDiv"><img class="sideImage" src="imgs/2007.png"></img></div> 
+    <div id="2008" class="imgDiv"><img class="sideImage" src="imgs/2008.png"></img><h2>2008</h2></div> 
+    <div id="2009" class="imgDiv"><img class="sideImage" src="imgs/2009.png"></img><h2>2009</h2></div> 
+    <div id="2010" class="imgDiv"><img class="sideImage" src="imgs/2010.png"></img><h2>2010</h2></div> 
+    <div id="2011" class="imgDiv"><img class="sideImage" src="imgs/2011.png"></img><h2>2011</h2></div> 
+    <div id="2012" class="imgDiv"><img class="sideImage" src="imgs/2012.png"></img><h2>2012</h2></div> 
+    <div id="2014" class="imgDiv"><img class="sideImage" src="imgs/2014.png"></img><h2>2014</h2></div> 
+    <div id="2015" class="imgDiv"><img class="sideImage" src="imgs/2015.png"></img><h2>2015</h2></div> 
+    <div id="2016" class="imgDiv"><img class="sideImage" src="imgs/2016.png"></img><h2>2016</h2></div> 
+    <div id="2017" class="imgDiv"><img class="sideImage" src="imgs/2017.png"></img><h2>2017</h2></div> 
+    <div id="2018" class="imgDiv"><img class="sideImage" src="imgs/2018.png"></img><h2>2018</h2></div> 
+    <div id="2019" class="imgDiv"><img class="sideImage" src="imgs/2019.png"></img><h2>2019</h2></div> 
+    <div id="2021" class="imgDiv"><img class="sideImage" src="imgs/2021.png"></img><h2>2021</h2></div> 
   </div>
   <div class="centerContainer">
     <h1>Indianapolis Violent Crime</h1>
     <div class="centerDisplay">
+      <div id="introBox">
+        <h1 id="introYear">2007</h1>
+        <h2 id="introHom"></h2>
+        <h2 id="introRap"></h2>
+        <h2 id="introAssault"></h2>
+      </div>
       <img id="indymap" src="imgs/IndyMap.png"></img>
       <svg viewBox="0 0 700 600">
         <g fill="none" stroke="#000" stroke-linejoin="round" stroke-linecap="round">
@@ -39,6 +52,91 @@ function calculateMapFadeIn(entry, year, timeStart, totalDuration){
   
   const percent = (q/d);
   return timeStart + totalDuration*percent;
+}
+
+async function triggerAnimation(data, year, dur, animStart) {
+  //Show minimap after animation completes
+  let promises = [];
+
+  // HOMICIDE
+  data.filter(function(d){ return d.CATEGORY === "CRIMINAL HOMICIDE"; })
+   .forEach(function(d, i){
+      promises.push(new Promise((resolve, reject) => {
+        setTimeout(function(){
+        d3.select('svg')
+          .append('circle')
+            .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+            .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+            .attr('r', '8px' )
+            .style("opacity", 1)
+            .attr("fill", '#1f2124')
+            .transition()
+            .duration(1000)
+            .style("opacity", 0.8)
+            .attr('r', '5px' );
+        resolve();
+      }, calculateMapFadeIn(d, year, animStart, dur));
+      }));
+  });
+
+  // RAPE
+  data.filter(function(d){ return d.CATEGORY === "RAPE"; })
+   .forEach(function(d, i){
+      promises.push(new Promise((resolve, reject) => {
+        setTimeout(function(){
+          d3.select('svg')
+            .append('circle')
+              .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+              .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+              .attr('r', '3px' )
+              .style("opacity", 1)
+              .attr("fill", 'red')
+              .transition()
+              .duration(500)
+              .style("opacity", 0.4)
+              .attr('r', '2px' );
+          resolve();
+        }, calculateMapFadeIn(d, year, animStart, dur));
+      }));
+  });
+
+  // ASSAULT
+  data.filter(function(d){ return d.CATEGORY === "ASSAULT"; })
+   .forEach(function(d, i){
+      promises.push(new Promise((resolve, reject) => {
+        setTimeout(function(){
+          d3.select('svg')
+            .append('circle')
+              .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+              .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+              .attr('r', '3px' )
+              .style("opacity", 1)
+              .attr("fill", '#0a4a2a')
+              .transition()
+              .duration(200)
+              .style("opacity", 0.2)
+              .attr('r', '2px' );
+          resolve();
+        }, calculateMapFadeIn(d, year, animStart, dur));
+      }));
+  });
+
+  console.log("Awaiting animation completion");
+  await Promise.allSettled(promises);
+  console.log("Completed animation");
+}
+
+function dataStats(data) {
+  let initialValue = 0;
+  let sumHomicides = 0;
+  let sumRapes = 0;
+  let sumAssault = 0;
+
+  sumHomicides = data.filter(function(d){ return d.CATEGORY === "CRIMINAL HOMICIDE"; }).length
+  sumRapes = data.filter(function(d){ return d.CATEGORY === "RAPE"; }).length
+  sumAssault = data.filter(function(d){ return d.CATEGORY === "ASSAULT"; }).length
+
+  return [sumHomicides, sumRapes, sumAssault]
 }
 
 async function init() {
@@ -111,82 +209,60 @@ async function init() {
   
   // ================================================
   // ================================================
-  // Step 2: Load the City Crime Data
+  // Step 2: Trigger Animation for All Years
   // ================================================
   // ================================================
 
-  //, which is configured for a 975x610 viewport.
-  data = await d3.csv("./data/IMPD_UCR_2007_Data.csv");
-  data = data.filter(function(d){ return ((d.X_COORD !== "0.0") && (d.Y_COORD !== "0.0")); });
-
-  //d3.selectAll("element").remove()
-
+  let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
+  let introDelay = 3000;
   let dur = 5000;
   let animStart = 1000;
+  let delay = 500;
+  let stats = [];
+  
 
-  //let years = [2007, ]
+  for (let i = 0; i < years.length; i++) {
+    data = await d3.csv("./data/IMPD_UCR_" +  years[i] + "_Data.csv");
+    data = await data.filter(function(d){ return ((d.X_COORD !== "0.0") && (d.Y_COORD !== "0.0")); });
 
-  //Show minimap after animation completes
-  setTimeout(function(){
-    document.getElementById("2007").style.display = "flex";
-  }, animStart + dur);
+    // Display Stats
+    stats = dataStats(data);
+    d3.select("#introYear").html(years[i]);
+    d3.select("#introHom").html("Homicide: " + stats[0]);
+    d3.select("#introRap").html("Rape: " + stats[1]);
+    d3.select("#introAssault").html("Assault: " + stats[2]);
+    
+    d3.select("#introBox").style("display","flex")
 
-  // HOMICIDE
-  data.filter(function(d){ return d.CATEGORY === "CRIMINAL HOMICIDE"; })
-   .forEach(function(d, i){
-      if (projection([d.X_COORD, d.Y_COORD]) === null) { console.log(d.X_COORD, d.Y_COORD); };
+    // Delay - then remove stats display
+    await new Promise((resolve, reject) => {setTimeout(resolve, introDelay)});
+    d3.select("#introBox").style("display","none")
+
+    await triggerAnimation(data, years[i], dur, animStart);
+
+    let promises = [];
+
+    promises.push(new Promise((resolve, reject) => {
       setTimeout(function(){
-        d3.select('svg')
-          .append('circle')
-            .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
-            .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
-            .attr('r', '8px' )
-            .style("opacity", 1)
-            .attr("fill", '#1f2124')
-            .transition()
-            .duration(1000)
-            .style("opacity", 0.8)
-            .attr('r', '5px' )
-      }, calculateMapFadeIn(d, 2007, animStart, dur));
-  });
+        document.getElementById(years[i]).style.display = "flex";
+        resolve();
+      }, 500);
+    }));
 
-  // RAPE
-  data.filter(function(d){ return d.CATEGORY === "RAPE"; })
-   .forEach(function(d, i){
-      if (projection([d.X_COORD, d.Y_COORD]) === null) { console.log(d.X_COORD, d.Y_COORD); };
-      setTimeout(function(){
-        d3.select('svg')
-          .append('circle')
-            .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
-            .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
-            .attr('r', '3px' )
-            .style("opacity", 1)
-            .attr("fill", 'red')
-            .transition()
-            .duration(500)
-            .style("opacity", 0.4)
-            .attr('r', '2px' )
-      }, calculateMapFadeIn(d, 2007, animStart, dur));
-  });
-
-  // ASSAULT
-  data.filter(function(d){ return d.CATEGORY === "ASSAULT"; })
-   .forEach(function(d, i){
-      if (projection([d.X_COORD, d.Y_COORD]) === null) { console.log(d.X_COORD, d.Y_COORD); };
-      setTimeout(function(){
-        d3.select('svg')
-          .append('circle')
-            .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
-            .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
-            .attr('r', '3px' )
-            .style("opacity", 1)
-            .attr("fill", '#0a4a2a')
-            .transition()
-            .duration(200)
-            .style("opacity", 0.2)
-            .attr('r', '2px' )
-      }, calculateMapFadeIn(d, 2007, animStart, dur));
-  });
+    if (i !== (years.length-1)) {
+      // Clear main map after animation
+      promises.push(new Promise((resolve, reject) => {
+        setTimeout(function(){
+          d3.selectAll("circle").remove();
+          resolve();
+        }, 500);
+      }));
+    }
+    
+    console.log("Awaiting clearing steps");
+    await Promise.allSettled(promises);
+    console.log("Awaiting cleared");
+  }
 
   /*
   xdomain = [2008, 2023];

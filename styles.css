@@ -2,6 +2,7 @@ svg {
     position: absolute; 
     width: 700px; 
     height: 600px;
+    top: 100px;
 }
 
 #indymap {
@@ -10,6 +11,32 @@ svg {
     max-height: 600px;
     margin-left: 46px;
     margin-top: 1px;
+    top: 100px;
+}
+
+#introBox {
+    position: absolute;
+    width: 700px; 
+    height: 600px;
+    background-color: #213020;
+    z-index: 3;
+    border-radius: 25px;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#introBox > h1 {
+    color: white;
+    font-size: 150px;
+    line-height: 130px;
+    margin: 5px auto;
+}
+#introBox > h2 {
+    color: white;
+    font-size: 75px;
+    line-height: 65px;
+    margin: 5px auto;
 }
 
 .main {
@@ -17,19 +44,15 @@ svg {
 }
 
 .centerDisplay {
-    width: 700px;
+    width: 680px;
     height: 600px;
 }
 
 .centerContainer {
-    margin-top: 80px;
+    margin-top: 40px;
     height: 700px;
     display: flex;
     flex-direction: column;
-}
-
-#heatmap {
-    position: absolute;
 }
 
 h1 { 
