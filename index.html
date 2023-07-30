@@ -4,6 +4,7 @@
 </head>
 <script src='https://d3js.org/d3.v5.min.js'></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js" integrity="sha512-iBAeBWWWFb8HqSBcrqcz98iIpuVH1la39dEYHtyQ/pGpeCQTQVvLJOWAuhv2Q7JSHp9k7hWA7sGxU3hHJe+tFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <body onload="init()">
 <div class="main">
   <div class="sidebar">
@@ -412,6 +413,11 @@ async function clearMapAnimation(delay) {
         d3.select("#mainSVG").selectAll("circle").remove();
         resolve();
       }, delay);
+
+      setTimeout(function(){
+        d3.select("#mainSVG").selectAll("g").remove();
+        resolve();
+      }, delay);
     })
 }
 
@@ -435,7 +441,7 @@ async function onYearClick(year) {
   await clearMapAnimation(0);
 
   var subData = await d3.csv("./data/IMPD_UCR_" +  year + "_Data.csv");
-  subData = await data.filter(function(d){ return ((d.X_COORD !== "0.0") && (d.Y_COORD !== "0.0")); });
+  subData = await subData.filter(function(d){ return ((d.X_COORD !== "0.0") && (d.Y_COORD !== "0.0")); });
   
   d3.select("#goAnim").on("click", function() { onAnimClick(subData, year); });
   
@@ -460,6 +466,129 @@ function onAnimClick(subData, year) {
       console.log("No categories selected.");
     }
 }
+
+function buildAnnotation2007(){
+  const type = d3.annotationCalloutCircle;
+
+  const annotations = [{
+    note: {
+      label: "Near East Indianapolis",
+      title: "High Crime"
+    },
+    //can use x, y directly instead of data
+    y: 320,
+    x: 340,
+    dx: 60,
+    dy: 65,
+    subject: {
+      radius: 60,
+      radiusPadding: 0
+    },
+    color: "red"
+  },
+  {
+    note: {
+      label: "Near Northside Indianapolis",
+      title: "High Crime"
+    },
+    //can use x, y directly instead of data
+    y: 220,
+    x: 300,
+    dx: -80,
+    dy: -20,
+    subject: {
+      radius: 60,
+      radiusPadding: 0
+    },
+    color: "red"
+  },];
+
+  const makeAnnotations = d3.annotation()
+    .editMode(true)
+    //also can set and override in the note.padding property
+    //of the annotation object
+    .notePadding(15)
+    .type(type)
+    .annotations(annotations)
+
+  d3.select("#mainSVG")
+    .append("g")
+    .attr("class", "annotation-group")
+    .call(makeAnnotations)
+}
+  
+
+function buildAnnotation2014(){
+  const type = d3.annotationCalloutCircle;
+
+  const annotations = [{
+    note: {
+      label: "High volumes in adjacent areas",
+      title: "Expansion"
+    },
+    //can use x, y directly instead of data
+    y: 320,
+    x: 390,
+    dx: 60,
+    dy: 65,
+    subject: {
+      radius: 60,
+      radiusPadding: 0
+    },
+    color: "red"
+  }
+  ];
+
+  const makeAnnotations = d3.annotation()
+    .editMode(true)
+    //also can set and override in the note.padding property
+    //of the annotation object
+    .notePadding(15)
+    .type(type)
+    .annotations(annotations)
+
+  d3.select("#mainSVG")
+    .append("g")
+    .attr("class", "annotation-group")
+    .call(makeAnnotations)
+}
+ 
+function buildAnnotation2021(){
+  const type = d3.annotationCalloutCircle;
+
+  const annotations = [{
+    note: {
+      label: "Citywide increase of Criminal Homicides",
+      title: "Homicide Spike"
+    },
+    //can use x, y directly instead of data
+    y: 280,
+    x: 280,
+    dx: -150,
+    dy: -150,
+    subject: {
+      radius: 200,
+      radiusPadding: 0
+    },
+    color: "red"
+  }
+  ];
+
+  const makeAnnotations = d3.annotation()
+    .editMode(true)
+    //also can set and override in the note.padding property
+    //of the annotation object
+    .notePadding(15)
+    .type(type)
+    .annotations(annotations)
+
+  d3.select("#mainSVG")
+    .append("g")
+    .attr("class", "annotation-group")
+    .call(makeAnnotations)
+}
+
+
 
 async function init() {
 
@@ -486,13 +615,15 @@ async function init() {
   // ================================================
 
   // Prep Animation Variables
-  let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
-  //let years  = [2007];
+  //let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
+  let years  = [2021];
   let introDelay = 3000;
-  let dur = 4000;
-  let animStart = 500;
+  let dur = 2000;
+  let animStart = 200;
   let delay = 500;
   let stats = [];
+  let baseDelay = 500;
+  let sceneDelay = 0;
   
   // Prep Right Pane
   margin = 50;
@@ -536,6 +667,19 @@ async function init() {
     d3.select("#introBox").style("display","none")
 
     await triggerAnimation(data, years[i], dur, animStart, false);
+    
+    if (years[i] === 2007) {
+      buildAnnotation2007();
+      sceneDelay = 3000;
+    } else if (years[i] === 2014){
+      buildAnnotation2014();
+      sceneDelay = 3000;
+    } else if (years[i] === 2021){
+      buildAnnotation2021();
+      sceneDelay = 3000;
+    } else {
+      sceneDelay = baseDelay;
+    }
 
     let promises = [];
 
@@ -543,12 +687,12 @@ async function init() {
       setTimeout(function(){
         document.getElementById(years[i]).style.display = "flex";
         resolve();
-      }, 500);
+      }, sceneDelay);
     }));
 
     if (i !== (years.length-1)) {
       // Clear main map after animation
-      promises.push(clearMapAnimation(500));
+      promises.push(clearMapAnimation(sceneDelay));
     }
     
     console.log("Awaiting clearing steps");
@@ -559,7 +703,7 @@ async function init() {
   d3.selectAll(".imgDiv").on("mouseover", function(){d3.select(this).style("background-color", "#DCDCDC");})
   d3.selectAll(".imgDiv").on("mouseout", function(){d3.select(this).style("background-color", "");});
   d3.selectAll(".imgDiv").on("click",  function(){
-    onYearClick(this.id)
+    onYearClick(this.id);
   });
 
   d3.select("#introYear").html("");
