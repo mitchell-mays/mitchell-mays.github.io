@@ -1,4 +1,4 @@
-svg {
+#mainSVG {
     position: absolute; 
     width: 700px; 
     height: 600px;
@@ -16,8 +16,8 @@ svg {
 
 #introBox {
     position: absolute;
-    width: 700px; 
-    height: 600px;
+    width: 650px; 
+    height: 650px;
     background-color: #213020;
     z-index: 3;
     border-radius: 25px;
@@ -53,6 +53,10 @@ svg {
     height: 700px;
     display: flex;
     flex-direction: column;
+}
+
+text {
+    font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif; 
 }
 
 h1 { 
@@ -93,4 +97,41 @@ h2 {
 .sideImage {
     max-width: 260px;
     max-height: 400px;
+}
+
+#rightSVG {
+    position: relative;
+    width: 500px;
+    height: 400px;
+}
+
+.rightPane {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 800px;
+}
+
+.graph > h2 {
+    margin: 10px auto;
+    
+}
+
+.graph {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#legend {
+    height: 120px;
+    width: 200px;
+    margin: 20px;
+    border: 2px solid black;
+    border-radius: 15px;
+}
+
+.slider {
+    margin: 675px auto 0px auto;
 }

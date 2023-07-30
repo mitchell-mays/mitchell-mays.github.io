@@ -31,9 +31,21 @@
         <h2 id="introAssault"></h2>
       </div>
       <img id="indymap" src="imgs/IndyMap.png"></img>
-      <svg viewBox="0 0 700 600">
+      <svg id="mainSVG" viewBox="0 0 700 600">
         <g fill="none" stroke="#000" stroke-linejoin="round" stroke-linecap="round">
         </g>
+      </svg>
+    </div>
+    <div class="slider">
+      <h2>2007</h2>
+    </div>
+  </div>
+  <div class="rightPane"> 
+    <div class="graph">
+      <h2 id="graphTitle">Crime Counts over Time</h2>
+      <svg id="rightSVG" viewBox="0 0 500 400">
+      </svg>
+      <svg id="legend">
       </svg>
     </div>
   </div>
@@ -54,16 +66,162 @@ function calculateMapFadeIn(entry, year, timeStart, totalDuration){
   return timeStart + totalDuration*percent;
 }
 
+function graphSetup(width, height){
+  var x = d3.scaleTime()
+    .domain([new Date(2007,1,1), new Date(2021,1,1)]).range([ 0, width ]).nice();
+  d3.select("#rightSVG")
+    .append("g")
+    .attr("transform", "translate(" + margin + "," + height + ")")
+    .call(d3.axisBottom(x));
+
+  // Add Y axis
+  var y = d3.scaleLinear()
+    .domain([0, 1500])
+    .range([ height, 5 ]);
+  d3.select("#rightSVG")
+    .append("g")
+    .attr("transform", "translate(" + margin + ",0)")
+    .call(d3.axisLeft(y));
+
+
+  // Add Legend
+  svg = d3.select("#legend");
+  svg.append("circle").attr("cx",20).attr("cy",30).attr("r", 6).style("fill", "#1f2124")
+  svg.append("circle").attr("cx",20).attr("cy",60).attr("r", 6).style("fill", "red")
+  svg.append("circle").attr("cx",20).attr("cy",90).attr("r", 6).style("fill", "#0a4a2a")
+  svg.append("text").attr("x", 40).attr("y", 30).text("Homicide").style("font-size", "15px").attr("alignment-baseline","middle")
+  svg.append("text").attr("x", 40).attr("y", 60).text("Rape (incl. attempted)").style("font-size", "15px").attr("alignment-baseline","middle")
+  svg.append("text").attr("x", 40).attr("y", 90).text("Assault / 5").style("font-size", "15px").attr("alignment-baseline","middle")
+}
+
+function graphBuild(year, stats, graphData){
+  d3.select("#rightSVG").selectAll(".line").remove();
+  
+  // Homicide
+    d3.select("#rightSVG")
+      .append("circle")
+      .attr("cx", xs(year) )
+      .attr("cy", ys(stats[0]))
+      .attr("r", 3)
+      .attr("transform", "translate(" + margin + "," + 0 + ")")
+      .style("fill", "#1f2124");
+    
+    d3.select("#rightSVG")
+      .append("path")
+      .datum(graphData) 
+      .attr("class", "line") 
+      .attr("transform", "translate(" + margin + "," + 0 + ")")
+      .style("fill", "none")
+      .style("stroke", "#1f2124")
+      .style("stroke-width", "2")
+      .attr("d", d3.line()
+        .x(function(d) { return xs(d.YEAR) })
+        .y(function(d) { return ys(d.HOM) })
+        .curve(d3.curveMonotoneX)
+        );
+
+    // Rape
+    d3.select("#rightSVG")
+      .append("circle")
+      .attr("cx", xs(year) )
+      .attr("cy", ys(stats[1]))
+      .attr("r", 3)
+      .attr("transform", "translate(" + margin + "," + 0 + ")")
+      .style("fill", "red");
+
+    d3.select("#rightSVG")
+      .append("path")
+      .datum(graphData) 
+      .attr("class", "line") 
+      .attr("transform", "translate(" + margin + "," + 0 + ")")
+      .style("fill", "none")
+      .style("stroke", "red")
+      .style("stroke-width", "2")
+      .attr("d", d3.line()
+        .x(function(d) { return xs(d.YEAR) })
+        .y(function(d) { return ys(d.RAPE) })
+        .curve(d3.curveMonotoneX)
+        );
+
+    
+    // Assault
+    d3.select("#rightSVG")
+      .append("circle")
+      .attr("cx", xs(year) )
+      .attr("cy", ys(stats[2] / 5))
+      .attr("r", 3)
+      .attr("transform", "translate(" + margin + "," + 0 + ")")
+      .style("fill", "#0a4a2a");
+    
+    d3.select("#rightSVG")
+      .append("path")
+      .datum(graphData) 
+      .attr("class", "line") 
+      .attr("transform", "translate(" + margin + "," + 0 + ")")
+      .style("fill", "none")
+      .style("stroke", "#0a4a2a")
+      .style("stroke-width", "2")
+      .attr("d", d3.line()
+        .x(function(d) { return xs(d.YEAR) })
+        .y(function(d) { return ys(d.ASSAULT / 5) })
+        .curve(d3.curveMonotoneX)
+        );
+    
+}
+
+function progressSliderBuild() {
+  var svg = d3.select('.slider')
+		.append('svg')
+		.attr('height', 100)
+		.attr('width', 500);
+
+  var barWidth = 500;
+
+	svg.append('rect')
+		.attr('class', 'bg-rect')
+		.attr('rx', 10)
+		.attr('ry', 10)
+		.attr('fill', 'gray')
+		.attr('height', 15)
+		.attr('width', barWidth)
+		.attr('x', 0);
+
+	var progress = svg.append('rect')
+    .attr('class', 'slide-block')
+    .attr('fill', '#DCDCDC')
+    .attr('height', 15)
+    .attr('width', 0)
+    .attr('rx', 10)
+    .attr('ry', 10)
+    .attr('x', 0);
+
+  svg.append("text").attr("x", 0).attr("y", 30).text("January 1st").style("font-size", "15px").attr("alignment-baseline","middle")
+  svg.append("text").attr("x", 400).attr("y", 30).text("December 31st").style("font-size", "15px").attr("alignment-baseline","middle")
+}
+
 async function triggerAnimation(data, year, dur, animStart) {
   //Show minimap after animation completes
   let promises = [];
+
+  // Setup progress indicator
+  d3.select(".slide-block").attr('width', 0);
+
+  promises.push(new Promise((resolve, reject) => { 
+    setTimeout(function(){
+      d3.select(".slide-block").transition()
+      .ease(d3.easeLinear)
+      .duration(dur)
+      .attr('width', 500);
+      resolve();
+    }, animStart);
+  }));
 
   // HOMICIDE
   data.filter(function(d){ return d.CATEGORY === "CRIMINAL HOMICIDE"; })
    .forEach(function(d, i){
       promises.push(new Promise((resolve, reject) => {
         setTimeout(function(){
-        d3.select('svg')
+        d3.select('#mainSVG')
           .append('circle')
             .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
             .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
@@ -84,7 +242,7 @@ async function triggerAnimation(data, year, dur, animStart) {
    .forEach(function(d, i){
       promises.push(new Promise((resolve, reject) => {
         setTimeout(function(){
-          d3.select('svg')
+          d3.select('#mainSVG')
             .append('circle')
               .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
               .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
@@ -105,7 +263,7 @@ async function triggerAnimation(data, year, dur, animStart) {
    .forEach(function(d, i){
       promises.push(new Promise((resolve, reject) => {
         setTimeout(function(){
-          d3.select('svg')
+          d3.select('#mainSVG')
             .append('circle')
               .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
               .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
@@ -140,10 +298,6 @@ function dataStats(data) {
 }
 
 async function init() {
-  //https://www.coursera.org/learn/cs-416-dv/assignment-submission/Y5Kdl/create-a-narrative-visualization/attempt
-  //https://observablehq.com/@d3/u-s-map
-  //open /Applications/Google\ Chrome.app --args --user-data-dir="/var/tmp/chrome-dev-disabled-security" --disable-web-security --disable-site-isolation-trials
-  //file:///Users/rmmays/Documents/MitchCode/D3_Project/mitchell-mays.github.io/index.html
 
   // ================================================
   // ================================================
@@ -151,7 +305,6 @@ async function init() {
   // ================================================
   // ================================================
 
-  
   indianaRoads = await d3.json("./Road_Centerlines_of_Indiana_2021.json");
   width = 700;
   height = 600;
@@ -159,52 +312,7 @@ async function init() {
   projection.fitSize([width,height],indianaRoads);
 
   /*
-  path = d3.geoPath().projection(projection);
-
-  geojson_base = {
-    "type": "FeatureCollection",
-    "features": []
-  };
-
-  // Deep copy base
-  geojson_highways = JSON.parse(JSON.stringify(geojson_base));
-  indianaRoadsHighways = indianaRoads.features.filter(function(d){ return (d.properties.speedlimit >= 50); })
-  geojson_highways.features = indianaRoadsHighways
-  console.log(indianaRoadsHighways.length)
-
-  d3.select('g')
-    .append('path')
-      .attr('stroke', '#000')
-      .attr('stroke-width', '2')
-      .attr('d', path(geojson_highways))
-      .attr("fill", "none");
-
-
-  // Deep copy base
-  geojson_roads1 = JSON.parse(JSON.stringify(geojson_base));
-  indianaRoads1 = indianaRoads.features.filter(function(d){ return (d.properties.speedlimit >= 35); })
-  geojson_roads1.features = indianaRoads1
-  console.log(indianaRoads1.length)
-
-  d3.select('g')
-    .append('path')
-      .attr('stroke', '#aaa')
-      .attr('stroke-width', '1')
-      .attr('d', path(geojson_roads1))
-      .attr("fill", "none");
-
-  // Deep copy base
-  geojson_roads2 = JSON.parse(JSON.stringify(geojson_base));
-  indianaRoads2 = indianaRoads.features.filter(function(d){ return (d.properties.speedlimit < 35); })
-  geojson_roads2.features = indianaRoads2
-  console.log(indianaRoads2.length)
-
-  d3.select('g')
-    .append('path')
-      .attr('stroke', '#aaa')
-      .attr('stroke-width', '0.5')
-      .attr('d', path(geojson_roads2))
-      .attr("fill", "none");
+  See reference.js
   */
   
   // ================================================
@@ -213,14 +321,33 @@ async function init() {
   // ================================================
   // ================================================
 
+  // Prep Animation Variables
   let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
   let introDelay = 3000;
-  let dur = 5000;
-  let animStart = 1000;
+  let dur = 4000;
+  let animStart = 500;
   let delay = 500;
   let stats = [];
   
+  // Prep Right Pane
+  margin = 50;
+  width = 500 - (1*margin);
+  height = 400 - margin;
 
+  xdomain = [2007, 2021];
+  xrange = [0,420];
+  ydomain = [1500,0];
+  yrange = [0,height];
+
+  xs = d3.scaleLinear().domain(xdomain).range(xrange);
+  ys = d3.scaleLinear().domain(ydomain).range(yrange);
+
+  graphSetup(width, height);
+  progressSliderBuild();
+
+  graphData = [];
+
+  // Animation Loop
   for (let i = 0; i < years.length; i++) {
     data = await d3.csv("./data/IMPD_UCR_" +  years[i] + "_Data.csv");
     data = await data.filter(function(d){ return ((d.X_COORD !== "0.0") && (d.Y_COORD !== "0.0")); });
@@ -233,6 +360,11 @@ async function init() {
     d3.select("#introAssault").html("Assault: " + stats[2]);
     
     d3.select("#introBox").style("display","flex")
+    d3.select(".slider").select("h2").html(years[i])
+
+    // Update Right Pane
+    graphData.push({ "YEAR": years[i], "HOM": stats[0], "RAPE": stats[1], "ASSAULT": stats[2] });
+    graphBuild(years[i], stats, graphData);
 
     // Delay - then remove stats display
     await new Promise((resolve, reject) => {setTimeout(resolve, introDelay)});
@@ -253,7 +385,7 @@ async function init() {
       // Clear main map after animation
       promises.push(new Promise((resolve, reject) => {
         setTimeout(function(){
-          d3.selectAll("circle").remove();
+          d3.select("#mainSVG").selectAll("circle").remove();
           resolve();
         }, 500);
       }));
@@ -263,16 +395,6 @@ async function init() {
     await Promise.allSettled(promises);
     console.log("Awaiting cleared");
   }
-
-  /*
-  xdomain = [2008, 2023];
-  xrange = [0,1];
-  ydomain = [0,337];
-  yrange = [0,1];
-
-  xs = d3.scaleLinear().domain(xdomain).range(xrange);
-  ys = d3.scaleLinear().domain(ydomain).range(yrange);
-  */
 }
 
 </script>
