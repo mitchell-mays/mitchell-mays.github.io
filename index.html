@@ -31,7 +31,7 @@
         <h2 id="introAssault"></h2>
       </div>
       <img id="indymap" src="imgs/IndyMap.png"></img>
-      <svg id="mainSVG" viewBox="0 0 700 600">
+      <svg id="mainSVG" viewBox="0 0 583 600">
         <g fill="none" stroke="#000" stroke-linejoin="round" stroke-linecap="round">
         </g>
       </svg>
@@ -40,15 +40,27 @@
       <h2>2007</h2>
     </div>
     <div class="animControls">
-      <input type="text" id="animDuration" name="animDuration" value="4000"></input>
-      <label for="animDuration">Animation Duration (ms)</label><br>
-      <input type="checkbox" class="checkbox" id="homicideCheck" name="homicide" value="CRIMINAL HOMICIDE">
-      <label for="homicideCheck">Homicide</label><br>
-      <input type="checkbox" class="checkbox" id="rapeCheck" name="rape" value="RAPE">
-      <label for="rapeCheck">Rape</label><br>
-      <input type="checkbox" class="checkbox" id="assaultCheck" name="assault" value="ASSAULT">
-      <label for="assaultCheck">Assault</label>
-      <button id="goAnim">Go</button>
+      <div class="controls">
+        <input type="text" id="animDuration" name="animDuration" value="4000"></input>
+        <label for="animDuration">Animation Duration (ms)</label>
+      </div>
+      <div class="controls">
+        <div class="checkboxWrapper">
+          <input type="checkbox" checked class="checkbox" id="homicideCheck" name="homicide" value="CRIMINAL HOMICIDE">
+          <label for="homicideCheck">Homicide</label>
+        </div>
+        <div class="checkboxWrapper">
+          <input type="checkbox" checked class="checkbox" id="rapeCheck" name="rape" value="RAPE">
+          <label for="rapeCheck">Rape</label>
+        </div>
+        <div class="checkboxWrapper">
+          <input type="checkbox" checked class="checkbox" id="assaultCheck" name="assault" value="ASSAULT">
+          <label for="assaultCheck">Assault</label>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="goAnim">Go</button>
+      </div>
     </div>
   </div>
   <div class="rightPane"> 
@@ -183,7 +195,7 @@ function graphBuild(year, stats, graphData){
 function progressSliderBuild() {
   var svg = d3.select('.slider')
 		.append('svg')
-		.attr('height', 100)
+		.attr('height', 40)
 		.attr('width', 500);
 
   var barWidth = 500;
@@ -417,6 +429,7 @@ function dataStats(data) {
 }
 
 async function onYearClick(year) {
+  d3.select("#introBox").style("display", "none");
   d3.select(".slider").select("h2").html(year);
   d3.select(".animControls").style("display", "flex");
   await clearMapAnimation(0);
@@ -457,7 +470,7 @@ async function init() {
   // ================================================
 
   indianaRoads = await d3.json("./Road_Centerlines_of_Indiana_2021.json");
-  width = 700;
+  width = 583;
   height = 600;
   projection = d3.geoAlbers().rotate([85]);
   projection.fitSize([width,height],indianaRoads);
@@ -473,8 +486,8 @@ async function init() {
   // ================================================
 
   // Prep Animation Variables
-  //let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
-  let years  = [2007];
+  let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
+  //let years  = [2007];
   let introDelay = 3000;
   let dur = 4000;
   let animStart = 500;
@@ -543,11 +556,17 @@ async function init() {
     console.log("Awaiting cleared");
   }
 
-  d3.select(".imgDiv").on("mouseover", function(){d3.select(this).style("background-color", "#DCDCDC");})
-  d3.select(".imgDiv").on("mouseout", function(){d3.select(this).style("background-color", "");});
-  d3.select(".imgDiv").on("click",  function(){
+  d3.selectAll(".imgDiv").on("mouseover", function(){d3.select(this).style("background-color", "#DCDCDC");})
+  d3.selectAll(".imgDiv").on("mouseout", function(){d3.select(this).style("background-color", "");});
+  d3.selectAll(".imgDiv").on("click",  function(){
     onYearClick(this.id)
   });
+
+  d3.select("#introYear").html("");
+  d3.select("#introHom").html("Select Year");
+  d3.select("#introRap").html("to Explore Data");
+  d3.select("#introAssault").html("");
+  d3.select("#introBox").style("display","flex")
 }
 
 </script>

@@ -1,23 +1,22 @@
 #mainSVG {
     position: absolute; 
-    width: 700px; 
+    width: 583px; 
     height: 600px;
     top: 100px;
 }
 
 #indymap {
     position: absolute; 
-    max-width: 700px;
+    max-width: 600px;
     max-height: 600px;
-    margin-left: 46px;
     margin-top: 1px;
     top: 100px;
 }
 
 #introBox {
     position: absolute;
-    width: 650px; 
-    height: 650px;
+    width: 600px; 
+    height: 600px;
     background-color: #213020;
     z-index: 3;
     border-radius: 25px;
@@ -44,13 +43,13 @@
 }
 
 .centerDisplay {
-    width: 680px;
+    width: 600px;
     height: 600px;
 }
 
 .centerContainer {
     margin-top: 40px;
-    height: 700px;
+    height: 600px;
     display: flex;
     flex-direction: column;
 }
@@ -80,7 +79,7 @@ h2 {
 }
 
 .sidebar {
-    width: 500px;
+    width: 320px;
     display: flex;
     flex-direction: column;
     min-height: -webkit-min-content;
@@ -134,11 +133,37 @@ h2 {
 }
 
 .slider {
-    margin: 675px auto 0px auto;
+    margin: 610px auto 0px auto;
+}
+
+#animDuration {
+    margin-top: 5px;
+}
+
+#goAnim {
+    margin-top: 5px;
 }
 
 .animControls {
+    margin: 10px auto;
     display: none;
+    flex-direction: row;
+    padding: 5px 15px;
+    border: 2px solid black;
+    border-radius: 15px;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    margin: 0px 30px;
+    justify-content: center;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    margin: 0px 30px;
 }
 
 .tooltip {
@@ -146,6 +171,114 @@ h2 {
     position: absolute;
     z-index: 10;
     background:#000;
+    border-radius: 15px;
     color: white;
     font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif; 
 }
+
+#goAnim {
+    background-color: #0a4a2a;
+    border-radius: 8px;
+    border-style: none;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    height: 40px;
+    line-height: 20px;
+    list-style: none;
+    margin: 0;
+    outline: none;
+    padding: 10px 16px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: color 100ms;
+    vertical-align: baseline;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+#goAnim:hover,
+#goAnim:focus {
+background-color: #268455;
+}
+
+.checkboxWrapper .checkbox {
+appearance: none;
+background-color: #dfe1e4;
+border-radius: 72px;
+border-style: none;
+flex-shrink: 0;
+height: 20px;
+margin: 0;
+position: relative;
+width: 30px;
+vertical-align: middle;
+}
+
+.checkboxWrapper .checkbox::before {
+bottom: -6px;
+content: "";
+left: -6px;
+position: absolute;
+right: -6px;
+top: -6px;
+}
+
+.checkboxWrapper .checkbox,
+.checkboxWrapper .checkbox::after {
+transition: all 100ms ease-out;
+}
+
+.checkboxWrapper .checkbox::after {
+background-color: #fff;
+border-radius: 50%;
+content: "";
+height: 14px;
+left: 3px;
+position: absolute;
+top: 3px;
+width: 14px;
+}
+
+.checkboxWrapper input[type=checkbox] {
+cursor: default;
+}
+
+.checkboxWrapper .checkbox:hover {
+background-color: #c9cbcd;
+transition-duration: 0s;
+}
+
+.checkboxWrapper .checkbox:checked {
+background-color: #0a4a2a;
+}
+
+.checkboxWrapper .checkbox:checked::after {
+background-color: #fff;
+left: 13px;
+}
+
+.checkboxWrapper :focus:not(.focus-visible) {
+outline: 0;
+}
+
+.checkboxWrapper .checkbox:checked:hover {
+background-color: #0a4a2a;
+}
+
+label { 
+    font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif; 
+    font-size: 15px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 200;
+    line-height: 26.4px;
+    margin: 5px auto;
+    vertical-align: middle;
+}
+
