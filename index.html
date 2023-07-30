@@ -616,8 +616,7 @@ async function init() {
   // ================================================
 
   // Prep Animation Variables
-  //let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
-  let years  = [2014];
+  let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
   let introDelay = 3000;
   let dur = 2000;
   let animStart = 200;
@@ -648,6 +647,15 @@ async function init() {
   for (let i = 0; i < years.length; i++) {
     data = await d3.csv("./data/IMPD_UCR_" +  years[i] + "_Data.csv");
     data = await data.filter(function(d){ return ((d.X_COORD !== "0.0") && (d.Y_COORD !== "0.0")); });
+
+    if (i === 0) {
+      d3.select("#introYear").html("Indy Crime");
+      d3.select("#introYear").style("font-size", "90px");
+      d3.select("#introHom").html("2007 - 2021");
+      d3.select("#introBox").style("display","flex")
+      await new Promise((resolve, reject) => {setTimeout(resolve, introDelay)});
+      d3.select("#introYear").style("font-size", "150px");
+    }
 
     // Display Stats
     stats = dataStats(data);
