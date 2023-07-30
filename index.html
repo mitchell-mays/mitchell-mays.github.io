@@ -39,6 +39,17 @@
     <div class="slider">
       <h2>2007</h2>
     </div>
+    <div class="animControls">
+      <input type="text" id="animDuration" name="animDuration" value="4000"></input>
+      <label for="animDuration">Animation Duration (ms)</label><br>
+      <input type="checkbox" class="checkbox" id="homicideCheck" name="homicide" value="CRIMINAL HOMICIDE">
+      <label for="homicideCheck">Homicide</label><br>
+      <input type="checkbox" class="checkbox" id="rapeCheck" name="rape" value="RAPE">
+      <label for="rapeCheck">Rape</label><br>
+      <input type="checkbox" class="checkbox" id="assaultCheck" name="assault" value="ASSAULT">
+      <label for="assaultCheck">Assault</label>
+      <button id="goAnim">Go</button>
+    </div>
   </div>
   <div class="rightPane"> 
     <div class="graph">
@@ -199,7 +210,7 @@ function progressSliderBuild() {
   svg.append("text").attr("x", 400).attr("y", 30).text("December 31st").style("font-size", "15px").attr("alignment-baseline","middle")
 }
 
-async function triggerAnimation(data, year, dur, animStart) {
+async function triggerAnimation(data, year, dur, animStart, tooltips) {
   //Show minimap after animation completes
   let promises = [];
 
@@ -216,72 +227,180 @@ async function triggerAnimation(data, year, dur, animStart) {
     }, animStart);
   }));
 
-  // HOMICIDE
-  data.filter(function(d){ return d.CATEGORY === "CRIMINAL HOMICIDE"; })
-   .forEach(function(d, i){
-      promises.push(new Promise((resolve, reject) => {
-        setTimeout(function(){
-        d3.select('#mainSVG')
-          .append('circle')
-            .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
-            .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
-            .attr('r', '8px' )
-            .style("opacity", 1)
-            .attr("fill", '#1f2124')
-            .transition()
-            .duration(1000)
-            .style("opacity", 0.8)
-            .attr('r', '5px' );
-        resolve();
-      }, calculateMapFadeIn(d, year, animStart, dur));
-      }));
-  });
+  if (tooltips){
+    console.log("HERE");
+    var tooltip = d3.select("body")
+      .append("div")
+      .classed("tooltip", true)
+      .style("visibility", "hidden")
+      .html("a simple tooltip");
 
-  // RAPE
-  data.filter(function(d){ return d.CATEGORY === "RAPE"; })
-   .forEach(function(d, i){
-      promises.push(new Promise((resolve, reject) => {
-        setTimeout(function(){
+    // HOMICIDE
+    data.filter(function(d){ return d.CATEGORY === "CRIMINAL HOMICIDE"; })
+    .forEach(function(d, i){
+        promises.push(new Promise((resolve, reject) => {
+          setTimeout(function(){
           d3.select('#mainSVG')
             .append('circle')
               .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
               .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
-              .attr('r', '3px' )
+              .attr('r', '8px' )
               .style("opacity", 1)
-              .attr("fill", 'red')
+              .attr("fill", '#1f2124')
+              .on("mouseover", function(){
+                tooltip.html(
+                  "Datetime: " + d.DATETIME 
+                  + "<br>Crime: " + d.CRIME 
+                  + "<br>Case: " + d.CASE 
+                  + "<br>Address: " + d.ADDRESS); return tooltip.style("visibility", "visible");
+              })
+              .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+              .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
               .transition()
-              .duration(500)
-              .style("opacity", 0.4)
-              .attr('r', '2px' );
+              .duration(1000)
+              .style("opacity", 0.8)
+              .attr('r', '5px' );
           resolve();
         }, calculateMapFadeIn(d, year, animStart, dur));
-      }));
-  });
+        }));
+    });
 
-  // ASSAULT
-  data.filter(function(d){ return d.CATEGORY === "ASSAULT"; })
-   .forEach(function(d, i){
-      promises.push(new Promise((resolve, reject) => {
-        setTimeout(function(){
+    // RAPE
+    data.filter(function(d){ return d.CATEGORY === "RAPE"; })
+    .forEach(function(d, i){
+        promises.push(new Promise((resolve, reject) => {
+          setTimeout(function(){
+            d3.select('#mainSVG')
+              .append('circle')
+                .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+                .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+                .attr('r', '3px' )
+                .style("opacity", 1)
+                .attr("fill", 'red')
+                .on("mouseover", function(){
+                  tooltip.html(
+                    "Datetime: " + d.DATETIME 
+                    + "<br>Crime: " + d.CRIME 
+                    + "<br>Case: " + d.CASE 
+                    + "<br>Address: " + d.ADDRESS); return tooltip.style("visibility", "visible");
+                })
+                .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+                .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
+                .transition()
+                .duration(500)
+                .style("opacity", 0.4)
+                .attr('r', '2px' );
+            resolve();
+          }, calculateMapFadeIn(d, year, animStart, dur));
+        }));
+    });
+
+    // ASSAULT
+    data.filter(function(d){ return d.CATEGORY === "ASSAULT"; })
+    .forEach(function(d, i){
+        promises.push(new Promise((resolve, reject) => {
+          setTimeout(function(){
+            d3.select('#mainSVG')
+              .append('circle')
+                .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+                .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+                .attr('r', '3px' )
+                .style("opacity", 1)
+                .attr("fill", '#0a4a2a')
+                .on("mouseover", function(){
+                  tooltip.html(
+                    "Datetime: " + d.DATETIME 
+                    + "<br>Crime: " + d.CRIME 
+                    + "<br>Case: " + d.CASE 
+                    + "<br>Address: " + d.ADDRESS); return tooltip.style("visibility", "visible");
+                })
+                .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+                .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
+                .transition()
+                .duration(200)
+                .style("opacity", 0.2)
+                .attr('r', '2px' );
+            resolve();
+          }, calculateMapFadeIn(d, year, animStart, dur));
+        }));
+    });
+  } else {
+        // HOMICIDE
+    data.filter(function(d){ return d.CATEGORY === "CRIMINAL HOMICIDE"; })
+    .forEach(function(d, i){
+        promises.push(new Promise((resolve, reject) => {
+          setTimeout(function(){
           d3.select('#mainSVG')
             .append('circle')
               .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
               .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
-              .attr('r', '3px' )
+              .attr('r', '8px' )
               .style("opacity", 1)
-              .attr("fill", '#0a4a2a')
+              .attr("fill", '#1f2124')
               .transition()
-              .duration(200)
-              .style("opacity", 0.2)
-              .attr('r', '2px' );
+              .duration(1000)
+              .style("opacity", 0.8)
+              .attr('r', '5px' );
           resolve();
         }, calculateMapFadeIn(d, year, animStart, dur));
-      }));
-  });
+        }));
+    });
+
+    // RAPE
+    data.filter(function(d){ return d.CATEGORY === "RAPE"; })
+    .forEach(function(d, i){
+        promises.push(new Promise((resolve, reject) => {
+          setTimeout(function(){
+            d3.select('#mainSVG')
+              .append('circle')
+                .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+                .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+                .attr('r', '3px' )
+                .style("opacity", 1)
+                .attr("fill", 'red')
+                .transition()
+                .duration(500)
+                .style("opacity", 0.4)
+                .attr('r', '2px' );
+            resolve();
+          }, calculateMapFadeIn(d, year, animStart, dur));
+        }));
+    });
+
+    // ASSAULT
+    data.filter(function(d){ return d.CATEGORY === "ASSAULT"; })
+    .forEach(function(d, i){
+        promises.push(new Promise((resolve, reject) => {
+          setTimeout(function(){
+            d3.select('#mainSVG')
+              .append('circle')
+                .attr("cx", projection([d.X_COORD, d.Y_COORD])[0])
+                .attr('cy', projection([d.X_COORD, d.Y_COORD])[1])
+                .attr('r', '3px' )
+                .style("opacity", 1)
+                .attr("fill", '#0a4a2a')
+                .transition()
+                .duration(200)
+                .style("opacity", 0.2)
+                .attr('r', '2px' );
+            resolve();
+          }, calculateMapFadeIn(d, year, animStart, dur));
+        }));
+    });
+  }
 
   console.log("Awaiting animation completion");
   await Promise.allSettled(promises);
   console.log("Completed animation");
+}
+
+async function clearMapAnimation(delay) {
+  return new Promise((resolve, reject) => {
+      setTimeout(function(){
+        d3.select("#mainSVG").selectAll("circle").remove();
+        resolve();
+      }, delay);
+    })
 }
 
 function dataStats(data) {
@@ -295,6 +414,38 @@ function dataStats(data) {
   sumAssault = data.filter(function(d){ return d.CATEGORY === "ASSAULT"; }).length
 
   return [sumHomicides, sumRapes, sumAssault]
+}
+
+async function onYearClick(year) {
+  d3.select(".slider").select("h2").html(year);
+  d3.select(".animControls").style("display", "flex");
+  await clearMapAnimation(0);
+
+  var subData = await d3.csv("./data/IMPD_UCR_" +  year + "_Data.csv");
+  subData = await data.filter(function(d){ return ((d.X_COORD !== "0.0") && (d.Y_COORD !== "0.0")); });
+  
+  d3.select("#goAnim").on("click", function() { onAnimClick(subData, year); });
+  
+  console.log("Year Clicked");
+}
+
+function onAnimClick(subData, year) {
+    console.log("Anim Clicked");
+    clearMapAnimation(0);
+    var animDur = d3.select("#animDuration").property("value");
+    var filter = d3.selectAll(".checkbox:not(:checked)");
+    
+    // Filter out crime categories that weren't selected
+    if (filter.size() != 3) {
+      filter.each(function() {
+        var cat = this.value;
+        subData = subData.filter(function(d){ return (d.CATEGORY !== cat); });
+      });
+
+      triggerAnimation(subData, year, animDur, 500, true);
+    } else {
+      console.log("No categories selected.");
+    }
 }
 
 async function init() {
@@ -322,7 +473,8 @@ async function init() {
   // ================================================
 
   // Prep Animation Variables
-  let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
+  //let years  = [2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2021];
+  let years  = [2007];
   let introDelay = 3000;
   let dur = 4000;
   let animStart = 500;
@@ -370,7 +522,7 @@ async function init() {
     await new Promise((resolve, reject) => {setTimeout(resolve, introDelay)});
     d3.select("#introBox").style("display","none")
 
-    await triggerAnimation(data, years[i], dur, animStart);
+    await triggerAnimation(data, years[i], dur, animStart, false);
 
     let promises = [];
 
@@ -383,18 +535,19 @@ async function init() {
 
     if (i !== (years.length-1)) {
       // Clear main map after animation
-      promises.push(new Promise((resolve, reject) => {
-        setTimeout(function(){
-          d3.select("#mainSVG").selectAll("circle").remove();
-          resolve();
-        }, 500);
-      }));
+      promises.push(clearMapAnimation(500));
     }
     
     console.log("Awaiting clearing steps");
     await Promise.allSettled(promises);
     console.log("Awaiting cleared");
   }
+
+  d3.select(".imgDiv").on("mouseover", function(){d3.select(this).style("background-color", "#DCDCDC");})
+  d3.select(".imgDiv").on("mouseout", function(){d3.select(this).style("background-color", "");});
+  d3.select(".imgDiv").on("click",  function(){
+    onYearClick(this.id)
+  });
 }
 
 </script>

@@ -80,7 +80,7 @@ h2 {
 }
 
 .sidebar {
-    width: 320px;
+    width: 500px;
     display: flex;
     flex-direction: column;
     min-height: -webkit-min-content;
@@ -89,9 +89,10 @@ h2 {
 }
 
 .imgDiv {
-    margin: 10px auto;
+    margin: 5px auto;
     flex-direction: column;
     display: none;
+    padding: 5px;
 }
 
 .sideImage {
@@ -134,4 +135,17 @@ h2 {
 
 .slider {
     margin: 675px auto 0px auto;
+}
+
+.animControls {
+    display: none;
+}
+
+.tooltip {
+    padding: 15px;
+    position: absolute;
+    z-index: 10;
+    background:#000;
+    color: white;
+    font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif; 
 }
